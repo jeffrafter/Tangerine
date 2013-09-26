@@ -2,7 +2,7 @@
 
 A tablet/phone application for assessing students
 
-Tangerine is a couchapp (http://couchapp.org/page/index) that uses 
+Tangerine is a couchapp (http://couchapp.org/page/index) that uses
 couchdb (http://couchdb.apache.org/) for a more streamlined process
 
 #### Getting Started - Mac
@@ -14,12 +14,12 @@ This guide is for snow leopard (Mac OS 10.6.x)
 Use the command
 
     brew doctor
-    
-to make sure everything is correct. When you have all the above installed 
+
+to make sure everything is correct. When you have all the above installed
 and brew reports "Raring to Brew" you should be ready to move on.
 Some known problems that can occur:
-- Problem: Problem with the pathing of redundant config files. 
-- Solution: Solved by moving them away from the root directory. 
+- Problem: Problem with the pathing of redundant config files.
+- Solution: Solved by moving them away from the root directory.
 
 - Problem: Error running 'make'
 - Solution: Run all the updates for brew, git, ruby, etc.
@@ -27,8 +27,8 @@ Some known problems that can occur:
 ##### 2. Install additional programs:
 Couchapp
 
-    sudo brew install pip
-    sudo env ARCHFLAGS="-arch i386 -arch x86_64" pip install couchapp
+    brew install python
+    pip install couchapp
 
 Coffeescript compiler:
 
@@ -67,7 +67,7 @@ Using github create a local clone of the tangerine repository.
 Go to the Tangerine directory that you just cloned into and push:
 
     cd Tangerine
-    couchapp push
+    /usr/local/share/python/couchapp push
 
 (TODO: may need to deal with .couchapprc and .couchappignore)
 
