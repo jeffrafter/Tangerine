@@ -1,5 +1,5 @@
 # This file loads the most basic settings related to Tangerine and kicks off Backbone's router.
-#   * The doc `configuration` holds the majority of settings. 
+#   * The doc `configuration` holds the majority of settings.
 #   * The Settings object contains many convenience functions that use configuration's data.
 #   * Templates should contain objects and collections of objects ready to be used by a Factory.
 # Also intialized here are: Backbone.js, and jQuery.i18n
@@ -77,7 +77,7 @@ Tangerine.onSettingsLoad = ->
 
             #$("<button id='reload'>reload me</button>").appendTo("#footer").click -> document.location.reload()
 
-            $.i18n.init 
+            $.i18n.init
               "fallbackLng" : "en"
               "lng"         : Tangerine.settings.get "language"
               "resGetPath"  : "locales/__lng__/translation.json"
@@ -113,8 +113,8 @@ Tangerine.onSettingsLoad = ->
                 router : Tangerine.router
               Tangerine.log    = new Log()
 
-              Tangerine.user.sessionRefresh 
-                success: -> 
+              Tangerine.user.sessionRefresh
+                success: ->
                   $("body").addClass(Tangerine.settings.get("context"))
 
                   Backbone.history.start()
@@ -128,7 +128,7 @@ Tangerine.transitionUsers = (callback) ->
     name     : "admin"
     password : "password"
     success: ->
-      $.couch.userDb (uDB) => 
+      $.couch.userDb (uDB) =>
         uDB.allDocs
           success: (resp) ->
             docIds = _.pluck(resp.rows, "id").filter (a) -> ~a.indexOf("org.couchdb")
@@ -141,7 +141,7 @@ Tangerine.transitionUsers = (callback) ->
                   # console.log doc
                   name = doc._id.split(":")[1]
 
-                  hashes = 
+                  hashes =
                     if doc.password_sha?
                       pass : doc.password_sha
                       salt : doc.salt
@@ -152,15 +152,15 @@ Tangerine.transitionUsers = (callback) ->
                   unless teacherId?
                     teacherId = Utils.humanGUID()
                     teacher = new Teacher "_id" : teacherId, "name" : name
-                    
+
                   if name is "admin"
                     roles = ["_admin"]
                     hashes = TabletUser.generateHash("password")
                   else
                     roles = doc.roles || []
-                    
 
-                  newDoc = 
+
+                  newDoc =
                     "_id"   : TabletUser.calcId(name)
                     "name"  : name
                     "roles" : roles
