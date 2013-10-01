@@ -214,7 +214,7 @@
       options = options || {};
 
       // Set the cookie
-      $.removeCookie( "AuthSession");
+      $.cookie("AuthSession", "");
       if (options.success) options.success();
       return;
 
