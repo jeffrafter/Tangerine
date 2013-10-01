@@ -171,10 +171,10 @@ jsFiles = [
 ]
 
 libFiles = [
-  'lib/phonegap.js',
   'lib/jquery.js',
   'lib/underscore.js',
   'lib/sha1.js',
+  'lib/pouchdb-nightly.js',
   'lib/jquery.couch.js',
   'lib/jquery.cookie.js',
   'lib/jquery.tablesorter.js',
@@ -210,6 +210,9 @@ def replace(file_path, contents)
   regExp = Regexp.new("#{startString}(.*)#{endString}", Regexp::MULTILINE)
   replacedResult = IO.read(file_path).gsub(regExp, "#{startString}\n#{contents}\n#{endString}")
   File.open(file_path, 'w') { |f| f.write(replacedResult) }
+  puts "*"*80
+  puts "*"*80
+  puts "*"*80
 end
 
 if $options[:make_index_dev]
