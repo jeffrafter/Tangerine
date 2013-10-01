@@ -15,9 +15,13 @@ Tangerine =
 Tangerine.$db = $.couch.db(Tangerine.db_name)
 
 # Backbone configuration
-Backbone.couch_connector.config.db_name   = Tangerine.db_name
-Backbone.couch_connector.config.ddoc_name = Tangerine.design_doc
-Backbone.couch_connector.config.global_changes = false
+# Backbone.couch_connector.config.db_name   = Tangerine.db_name
+# Backbone.couch_connector.config.ddoc_name = Tangerine.design_doc
+# Backbone.couch_connector.config.global_changes = false
+Backbone.sync = BackbonePouch.sync({
+  db: PouchDB('tangerine')
+});
+Backbone.Model.prototype.idAttribute = '_id';
 
 # set underscore's template engine to accept handlebar-style variables
 _.templateSettings = interpolate : /\{\{(.+?)\}\}/g
@@ -34,33 +38,34 @@ Tangerine.onBackButton = (event) ->
 
 
 # Grab our system config doc
-Tangerine.config = new Backbone.Model "_id" : "configuration"
+Tangerine.config = new Backbone.Model(configuration)
 
-Tangerine.config.fetch
-  error   : ->
-    console.log "could not fetch configuration"
+# Tangerine.config.fetch
+#  error   : ->
+#    console.log "could not fetch configuration"
+#
+#  success : ->
 
-  success : ->
-    # get our Tangerine settings
-    Tangerine.settings = new Settings "_id" : "settings"
-    Tangerine.settings.fetch
-      success: ->
+# get our Tangerine settings
+Tangerine.settings = new Settings "_id" : "settings"
+Tangerine.settings.fetch
+  success: ->
 
-        # guarentee instanceId
-        Tangerine.settings.set "instanceId", Utils.humanGUID() unless Tangerine.settings.has("instanceId")
+    # guarentee instanceId
+    Tangerine.settings.set "instanceId", Utils.humanGUID() unless Tangerine.settings.has("instanceId")
 
-        Tangerine.onSettingsLoad()
+    Tangerine.onSettingsLoad()
+  error: ->
+    Tangerine.settings.set Tangerine.config.get("defaults")['settings']
+
+    # generate a random ID for this individual instance
+    Tangerine.settings.set "instanceId", Utils.humanGUID()
+
+    Tangerine.settings.save null,
       error: ->
-        Tangerine.settings.set Tangerine.config.get("defaults")['settings']
-
-        # generate a random ID for this individual instance
-        Tangerine.settings.set "instanceId", Utils.humanGUID()
-
-        Tangerine.settings.save null,
-          error: ->
-            console.log "couldn't save new settings"
-          success: ->
-            Tangerine.onSettingsLoad()
+        console.log "couldn't save new settings"
+      success: ->
+        Tangerine.onSettingsLoad()
 
 Tangerine.onSettingsLoad = ->
 
