@@ -161,6 +161,10 @@ jsFiles = [
 
   'router.js',
 
+  'configuration.js',
+
+  'templates.js',
+
   'boot.js',
 
   'version.js'
@@ -191,6 +195,7 @@ libFiles = [
   'lib/backbone.js',
   'lib/moment.js',
   'lib/backbone-couchdb.js',
+  'lib/backbone-pouch.js',
   'lib/transcriptionCheckdigit.js',
   'lib/table2CSV.js',
   'lib/base64.js',
