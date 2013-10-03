@@ -55,7 +55,6 @@ watch ( '.*\.coffee$' ) { |match|
 #    puts "\nDocco-menting:\t\t#{match}\n"
     push()
   end
-
 }
 
 watch ( '.*\.less$' ) { |match| 
@@ -74,6 +73,13 @@ watch ( '.*\.css$|.*\.js$|.*\.html$|.*\.json$' ) { |match|
     puts "\nUpdating:\t\t#{match}\nPushing to couchapp\n\n"
     push()
   end
+  match = String(match)
+  path = match.split("/")
+  pouchDir = "../../tangerine-pouch/www/" + path[1..path.length-2].join("/")
+  filename = path[path.length-1]
+  pouchFilepath = pouchDir + "/" + filename
+  FileUtils.cp(match, pouchFilepath)
+  puts "\nCopying FileName:\t#{match}\tTo Pouch:\t#{pouchFilepath}"
 }
 
 push()

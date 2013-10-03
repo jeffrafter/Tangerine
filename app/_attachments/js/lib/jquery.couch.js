@@ -221,7 +221,6 @@
       });
     },
 
-
     // Delete your current CouchDB user session
     logout: function(options) {
       options = options || {};
