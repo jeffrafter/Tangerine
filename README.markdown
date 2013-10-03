@@ -63,24 +63,39 @@ Using github create a local clone of the tangerine repository.
 
     git clone https://github.com/Tangerine-Community/Tangerine.git
 
-##### 6. Deploy the tangerine source code to your local CouchDB
+##### 6. Init the js filesystem to minify files
+cd to the app/_attachments/js dir and run init.js
+
+##### 7. Create a .couchapprc file in the app directory
+
+Edit USERNAME and PASSWORD
+
+    { "env":
+      { "default"    : {"db": "http://USERNAME:PASSWORD@localhost:5984/tangerine"}
+      }
+    }
+
+
+##### 8. Deploy the tangerine source code to your local CouchDB
 Go to the Tangerine directory that you just cloned into and push:
 
     cd Tangerine
     couchapp push
 
-(TODO: may need to deal with .couchapprc and .couchappignore)
-
-Check that it is working by going to <http://localhost:5984/tangerine/_design/tangerine/index.html>
+Check that it is working by looking at the debug version at <http://localhost:5984/tangerine/_design/ojai/index-dev.html>.
+The deploy version - with a minimised app.js - is at  <http://localhost:5984/tangerine/_design/tangerine/index.html>
 
 If not check for error message from your couchapp push command. You can also look at the couchdb log file.
 
-##### 7. Setup automatic pushing
+##### 9. Setup automatic pushing
 From the Tangerine directory run:
 
     watchr file.watchr
 
 watchr will watch all files in your Tangerine directory. When they change it will compile any coffeescript that has been updated and then push the changes to the couchdb.
+
+If you are developing for pouchdb project based on Tangerine, the script also copies the coffee file and generated .js
+file to the tangerine-pouch/www/ directory when a .coffee file is modified. Comment this out if you do not want this to happen.
 
 #### Getting Started - Windows (TODO)
 
