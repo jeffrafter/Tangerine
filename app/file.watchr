@@ -1,3 +1,5 @@
+require 'fileutils'
+
 def push
   version = `git log --pretty=format:'%h' -n 1`
 
@@ -32,6 +34,17 @@ watch ( '.*\.coffee$' ) { |match|
   else
     puts "\nCompiling:\t\t#{match}"
     result = `coffee --bare --compile #{match} 2>&1`
+    path = match.split("/")
+    # Path:		["_attachments", "js", "helpers.coffee"]		File:		_attachments/js/helpers.coffee
+    pouchDir = "../../tangerine-pouch/www/" + path[1..path.length-2].join("/")
+    coffeeFilenameArray = path[path.length-1].split(".")
+    sourceJsFileName = path[0..path.length-2].join("/") + "/" + coffeeFilenameArray[0] + ".js"
+    pouchDirCoffeeFileName = pouchDir + "/" + coffeeFilenameArray[0] + ".coffee"
+    pouchDirJsFileName = pouchDir + "/" + coffeeFilenameArray[0] + ".js"
+    puts "\nSourceCoffeeFileName:\t#{match}\tCopyToPouch:\t#{pouchDirCoffeeFileName}"
+    FileUtils.cp(match, pouchDirCoffeeFileName)
+    puts "\nSourceJsFileName:\t#{sourceJsFileName}\tCopyToPouch:\t#{pouchDirJsFileName}"
+    FileUtils.cp(sourceJsFileName, pouchDirJsFileName)
   end
 
   if result.index "Error: In"
@@ -42,7 +55,6 @@ watch ( '.*\.coffee$' ) { |match|
 #    puts "\nDocco-menting:\t\t#{match}\n"
     push()
   end
-
 }
 
 watch ( '.*\.less$' ) { |match| 
@@ -61,6 +73,13 @@ watch ( '.*\.css$|.*\.js$|.*\.html$|.*\.json$' ) { |match|
     puts "\nUpdating:\t\t#{match}\nPushing to couchapp\n\n"
     push()
   end
+  match = String(match)
+  path = match.split("/")
+  pouchDir = "../../tangerine-pouch/www/" + path[1..path.length-2].join("/")
+  filename = path[path.length-1]
+  pouchFilepath = pouchDir + "/" + filename
+  FileUtils.cp(match, pouchFilepath)
+  puts "\nCopying FileName:\t#{match}\tTo Pouch:\t#{pouchFilepath}"
 }
 
 push()
