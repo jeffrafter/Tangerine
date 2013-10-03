@@ -97,6 +97,18 @@ watchr will watch all files in your Tangerine directory. When they change it wil
 If you are developing for pouchdb project based on Tangerine, the script also copies the coffee file and generated .js
 file to the tangerine-pouch/www/ directory when a .coffee file is modified. Comment this out if you do not want this to happen.
 
+##### 10. Development tips
+
+- Delete indexedDB database in javascript console:
+
+        indexedDB.deleteDatabase('_pouch_tangerine');
+
+- View cookies:
+
+        document.cookie=prompt(document.cookie,document.cookie)
+
+
+
 #### Getting Started - Windows (TODO)
 
 We have not done this yet, so we need help in documenting this section. Some things to try:
