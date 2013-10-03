@@ -42,7 +42,7 @@ class ResultsView extends Backbone.View
     $details = @$el.find("#details_#{targetId}")
     if not _.isEmpty($details.html())
       $details.empty()
-      return 
+      return
 
     result = new Result "_id" : targetId
     result.fetch
@@ -53,7 +53,7 @@ class ResultsView extends Backbone.View
         view.render()
         $details.html "<div class='info_box'>" + $(view.el).html() + "</div>"
         view.close()
-        
+
 
 
   cloud: ->
@@ -92,12 +92,12 @@ class ResultsView extends Backbone.View
     return false
 
   initDetectOptions: ->
-    @available = 
-      cloud : 
+    @available =
+      cloud :
         ok : false
         checked : false
       tablets :
-        ips : [] 
+        ips : []
         okCount  : 0
         checked  : 0
         total : 256
@@ -106,7 +106,7 @@ class ResultsView extends Backbone.View
     $("button.cloud, button.tablets").attr("disabled", "disabled")
     @detectCloud()
     @detectTablets()
-    
+
   detectCloud: ->
     # Detect Cloud
     $.ajax
@@ -144,7 +144,7 @@ class ResultsView extends Backbone.View
       message = "#{percentage}%"
     tabletMessage = "Searching for tablets: #{message}"
 
-    @$el.find(".checking_status").html "#{tabletMessage}" if @available.tablets.checked > 0 
+    @$el.find(".checking_status").html "#{tabletMessage}" if @available.tablets.checked > 0
 
     if @available.cloud.checked && @available.tablets.checked == @available.tablets.total
       @$el.find(".status .info_box").html "Done detecting options"
@@ -228,7 +228,7 @@ class ResultsView extends Backbone.View
       <br>
       <button class='command refresh'>Refresh</button>
     "
-    
+
     @$el.html html
 
     @updateResults()
@@ -246,7 +246,7 @@ class ResultsView extends Backbone.View
     # @resultOffset
     # @resultLimit
 
-    val           = parseInt($("#page").val()) || 1 
+    val           = parseInt($("#page").val()) || 1
     calculated    = (val - 1) * @resultLimit
     maxPage       = Math.floor(@results.length / @resultLimit )
     @resultOffset = Math.limit(0, calculated, maxPage * @resultLimit) # default page 1 == 0_offset
@@ -264,7 +264,8 @@ class ResultsView extends Backbone.View
       else if Tangerine.settings.get("context") == "mobile"
         "local"
 
-    $.ajax 
+    # TODO, this should be pulling from local and should therefore not be ajax.
+    $.ajax
       url: Tangerine.settings.urlView(location, "resultSummaryByAssessmentId")+"?descending=true&limit=#{@resultLimit}&skip=#{@resultOffset}"
       type: "POST"
       dataType: "json"
@@ -278,7 +279,7 @@ class ResultsView extends Backbone.View
         count = rows.length
 
         maxResults  = 100
-        currentPage = Math.floor( @resultOffset / @resultLimit ) + 1 
+        currentPage = Math.floor( @resultOffset / @resultLimit ) + 1
 
         if @results.length > maxResults
           @$el.find("#controls").removeClass("confirmation")
@@ -289,7 +290,7 @@ class ResultsView extends Backbone.View
 
         htmlRows = ""
         for row in rows
-          
+
           id      = row.value?.participant_id || "No ID"
           endTime = row.value.end_time
           if endTime?
@@ -313,11 +314,11 @@ class ResultsView extends Backbone.View
         @$el.find("#results_container").html htmlRows
 
         @$el.find(focus).focus()
-  
+
   afterRender: =>
     for view in @subViews
       view.afterRender?()
-      
+
   clearSubViews:->
     for view in @subViews
       view.close()

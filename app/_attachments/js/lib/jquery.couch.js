@@ -94,10 +94,8 @@
       var authSession = $.cookie("AuthSession");
       var resp = {
         ok: true,
-        userCtx: {name: authSession, roles: []}}
+        userCtx: {name: authSession, roles: []}
       };
-      resp.userCtx = {"name": authSession, "roles": []};
-      resp.ok = true;
       if (options.success) options.success(resp);
 
       return;
@@ -193,18 +191,16 @@
       options = options || {};
 
       // Set the cookie
-      $.cookie( "AuthSession", "admin", { expires: 600 });
+      options.name = options.name || "admin";
       $.cookie( "AuthSession", options.name, { expires: 600 });
       // In our AuthSession, we are cheating and only have names
       var authSession = $.cookie("AuthSession");
-      var resp = [
-          {"ok": true},
-          {"userCtx": {"name": authSession, "roles": []}}
-      ];
-      resp.userCtx = {"name": authSession, "roles": []};
-      resp.ok = true;
-
+      var resp = {
+        ok: true,
+        userCtx: {name: authSession, roles: []}
+      };
       if (options.success) options.success(resp);
+
       return;
 
       return $.ajax({

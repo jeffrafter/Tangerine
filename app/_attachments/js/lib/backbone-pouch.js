@@ -3,7 +3,7 @@
 * Copyright (c) 2013 Johannes J. Schmidt; Licensed MIT */
 (function(root) {
   'use strict';
-  
+
   var BackbonePouch;
   if (typeof exports === 'object') {
     BackbonePouch = exports;
@@ -125,17 +125,23 @@
               options.db.changes(_.extend({}, options.options.changes, {
                 since: info.update_seq,
                 onChange: function(change) {
-                  var todo = model.get(change.id);
+                  var currentDoc = model.get(change.id);
 
                   if (change.deleted) {
-                    if (todo) {
-                      todo.destroy();
+                    if (currentDoc) {
+                      currentDoc.destroy();
                     }
                   } else {
-                    if (todo) {
-                      todo.set(change.doc);
+                    if (currentDoc) {
+                      currentDoc.set(change.doc);
                     } else {
-                      model.add(change.doc);
+                      // This was changed because it seems that the model was expecting to be a
+                      // collection and might not be
+                      if (model.add)
+                        model.add(change.doc);
+                      else {
+                        model.set(change.doc);
+                      }
                     }
                   }
 
@@ -193,18 +199,18 @@
       if (model.collection && model.collection.pouch && model.collection.pouch.db) {
         return model.collection.pouch.db;
       }
-      
+
       if (defaults.db) {
         return defaults.db;
       }
-      
+
       var options = model.sync();
       if (options.db) {
         return options.db;
       }
 
       // TODO: ask sync adapter
-        
+
       throw new Error('A "db" property must be specified');
     }
 
@@ -216,7 +222,7 @@
             if (typeof filter === 'function') {
               return filter(key, atts[key]);
             }
-            
+
             return atts[key].content_type.match(filter);
           });
         }
@@ -245,7 +251,7 @@
         if (!this.id) {
           this.set({ _id: Math.uuid() }, { silent: true });
         }
-        
+
         var db = getPouch(this);
         var that = this;
         return db.putAttachment(attachmentId(this.id, name), this.get('_rev'), blob, type, function(err, response) {
