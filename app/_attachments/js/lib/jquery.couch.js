@@ -95,6 +95,8 @@
               {"ok": true},
               {"userCtx": {"name": authSession, "roles": []}}
           ];
+          resp.userCtx = {"name": authSession, "roles": []};
+          resp.ok = true;
           if (options.success) options.success(resp);
 
           return;
@@ -199,6 +201,9 @@
           {"ok": true},
           {"userCtx": {"name": authSession, "roles": []}}
       ];
+      resp.userCtx = {"name": authSession, "roles": []};
+      resp.ok = true;
+
       if (options.success) options.success(resp);
       return;
 

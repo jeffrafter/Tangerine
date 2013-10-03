@@ -107,7 +107,14 @@ file to the tangerine-pouch/www/ directory when a .coffee file is modified. Comm
 
         document.cookie=prompt(document.cookie,document.cookie)
 
+- If a coffee file does not generate via uglify.rb (see file.watchr), run it manually:
 
+        www/js]$ coffee --bare --compile boot.coffee 2>&1
+
+##### 11. Tangerine admin tips
+
+- Configuration - once it is set, reads only from the database.
+    - Context - context is set in configuration.js. If "server", it will only show login screen - not registration.
 
 #### Getting Started - Windows (TODO)
 

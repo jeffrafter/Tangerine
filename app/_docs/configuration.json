@@ -31,7 +31,7 @@
 
    "defaults" : {
       "settings" : {
-         "context" : "mobile",
+         "context" : "server",
          "groupDDoc" : "ojai",
          "language" : "en",
          "log" : [""],
