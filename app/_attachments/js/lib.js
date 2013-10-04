@@ -5928,7 +5928,7 @@ function binb2b64(binarray)
       var authSession = $.cookie("AuthSession");
       var resp = {
         ok: true,
-        userCtx: {name: authSession, roles: []}}
+        userCtx: {name: authSession, roles: []}
       };
       if (options.success) options.success(resp);
 
@@ -6031,7 +6031,7 @@ function binb2b64(binarray)
       var authSession = $.cookie("AuthSession");
       var resp = {
         ok: true,
-        userCtx: {name: authSession, roles: []}}
+        userCtx: {name: authSession, roles: []}
       };
       if (options.success) options.success(resp);
 
@@ -8882,17 +8882,23 @@ Backbone.Collection = (function(_super) {
               options.db.changes(_.extend({}, options.options.changes, {
                 since: info.update_seq,
                 onChange: function(change) {
-                  var todo = model.get(change.id);
+                  var currentDoc = model.get(change.id);
 
                   if (change.deleted) {
-                    if (todo) {
-                      todo.destroy();
+                    if (currentDoc) {
+                      currentDoc.destroy();
                     }
                   } else {
-                    if (todo) {
-                      todo.set(change.doc);
+                    if (currentDoc) {
+                      currentDoc.set(change.doc);
                     } else {
-                      model.add(change.doc);
+                      // This was changed because it seems that the model was expecting to be a
+                      // collection and might not be
+                      if (model.add)
+                        model.add(change.doc);
+                      else {
+                        model.set(change.doc);
+                      }
                     }
                   }
 

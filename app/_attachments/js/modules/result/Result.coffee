@@ -8,7 +8,7 @@ class Result extends Backbone.Model
     if options.blank == true
       # Checking for phonegap Device... could do it this way:
       # navigator.userAgent.match(/(iPhone|iPod|iPad|Android|BlackBerry|IEMobile)/)
-      if !device && typeof(Device) !== "undefined"
+      if !device && typeof(Device) != "undefined"
         device = Device
       device = device || {}
       deviceInfo =

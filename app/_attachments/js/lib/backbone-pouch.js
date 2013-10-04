@@ -77,7 +77,6 @@
 
     var adapter = function(method, model, options) {
       options = options || {};
-      console.log(model, model.pouch);
       applyDefaults(options, model && model.pouch || {});
       applyDefaults(options, defaults);
 
