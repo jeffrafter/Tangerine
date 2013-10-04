@@ -3,14 +3,14 @@ var configuration = {
 
    "local" : {
       "dbName" : "tangerine",
-      "login"  : "localuser:localpass",
+      "login"  : "admin:luvcouch",
       "host"   : "http://localhost"
    },
 
    "update" : {
-      "target" : "http://localadmin:localpassword@localhost:5984/tangerine",
+      "target" : "http://admin:luvcouch@localhost:5984/tangerine",
       "dbName" : "update",
-      "host"   : "databases.tangerinecentral.org",
+      "host"   : "ugandagaap.iriscouch.com",
       "login"  : ""
    },
 
@@ -20,7 +20,7 @@ var configuration = {
 
    "trunk" : {
       "dbName" : "tangerine",
-      "host" : "databases.tangerinecentral.org"
+      "host" : "ugandagaap.iriscouch.com"
    },
 
    "groupDBPrefix" : "group-",
@@ -35,8 +35,8 @@ var configuration = {
          "groupDDoc" : "ojai",
          "language" : "en",
          "log" : [""],
-         "groupName" : "",
-         "groupHost" : "http://databases.tangerinecentral.org",
+         "groupName" : "sweetgroup",
+         "groupHost" : "http://ugandagaap.iriscouch.com",
          "upPass" : "pass"
       }
    },
