@@ -39,10 +39,10 @@ class SubtestRunView extends Backbone.View
     "
 
     # Use prototype specific views here
-    if !(protoView = [@protoViews[@model.get 'prototype']])
-      return
-    if !(protoView['run'])
-      return
+#    if !(protoView = [@protoViews[@model.get 'prototype']])
+#      return
+#    if !(protoView['run'])
+#      return
 
     @prototypeView = new window[@protoViews[@model.get 'prototype']['run']]
       model  : @model

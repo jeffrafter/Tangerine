@@ -15,7 +15,9 @@ var configuration = {
       "host"   : "ugandagaap.iriscouch.com",
       "login"  : ""
    },
-
+  "log" : {
+    "spp" : true
+  },
    "subnet" : {
       "base" : "192.168.1."
    },

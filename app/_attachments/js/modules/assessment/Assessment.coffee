@@ -43,6 +43,15 @@ class Assessment extends Backbone.Model
         allSubtests = new Subtests
         allSubtests.fetch
           key: @id
+          fetch: 'query'
+          options:
+            query:
+              fun:
+                map: ( doc ) ->
+                  return unless doc.collection is "subtest"
+                  id = doc.assessmentId or doc.curriculumId
+                  return unless id != null
+                  emit id, doc
           success: (collection) =>
             @subtests = collection
             @subtests.maintainOrder()
