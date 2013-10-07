@@ -78,12 +78,21 @@ class Assessment extends Backbone.Model
       else
         "/"+sourceDB+"/"+Tangerine.settings.couch.view + "byDKey"
 
+    replicationErrorLog = (err, result) =>
+      if result?
+        console.log("Replication is fine. ")
+      else
+        console.log("Replication error: " + JSON.stringify(err));
+        if err && (err.status is 401)
+          alert("Error: Name or password is incorrect. Unable to connect to the server.");
+
     $.ajax 
       url: sourceDKey,
       type: "GET"
       dataType: "jsonp"
-#      data: keys: JSON.stringify(dKeys)
-      data: keys: ["testtest"]
+      data: keys: JSON.stringify(dKeys)
+#      data: keys: dKeys
+#        ["testtest"]
       error: (a, b) => @trigger "status", "import error", "#{a} #{b}"
       success: (data) =>
         docList = []
@@ -93,13 +102,14 @@ class Assessment extends Backbone.Model
         docList = _.uniq(docList)
         opts =
           continuous: false,
-          doc_ids:docList
+#          doc_ids:docList
 #          withCredentials:true,
           cookieAuth: {username:"uploader-sweetgroup", password:"pass"},
           auth: {username:"uploader-sweetgroup", password:"pass"},
 #          complete: onComplete,
-          timeout: 60000;
-        Backbone.sync.defaults.db.replicate.from(sourceDB, opts);
+          timeout: 60000,
+          doc_ids: docList;
+        Backbone.sync.defaults.db.replicate.from(sourceDB, opts, replicationErrorLog);
 
 #        $.ajax
 #          url: localDKey,

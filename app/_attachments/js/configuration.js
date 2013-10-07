@@ -1,12 +1,14 @@
 var configuration = {
    "_id" : "configuration",
 
-   "local" : {
-      "dbName" : "tangerine",
-      "login"  : "admin:luvcouch",
-      "host"   : "http://localhost"
-   },
-
+  "local" : {
+    "dbName" : "group-sweetgroup",
+    "login"  : "admin:luvcouch",
+    "host"   : "http://localhost:5984"
+  },
+  "import" : {
+    "couchappUrl": "http://localhost:5984/group-sweetgroup/_design/ojai/index.html"
+  },
    "update" : {
       "target" : "http://admin:luvcouch@localhost:5984/tangerine",
       "dbName" : "update",
@@ -36,7 +38,7 @@ var configuration = {
          "language" : "en",
          "log" : [""],
          "groupName" : "sweetgroup",
-         "groupHost" : "http://ugandagaap.iriscouch.com",
+         "groupHost" : "http://localhost:5984",
          "upPass" : "pass"
       }
    },

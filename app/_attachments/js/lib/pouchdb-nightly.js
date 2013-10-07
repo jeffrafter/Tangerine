@@ -794,7 +794,7 @@
     }
   };
 
-  Pouch.DEBUG = false;
+  Pouch.DEBUG = true;
   Pouch.openReqList = {};
   Pouch.adapters = {};
   Pouch.plugins = {};
@@ -1895,8 +1895,10 @@
         return false;
       }
       if (opts.doc_ids && opts.doc_ids.indexOf(change.id) === -1) {
+        console.log("Not doc_id: " + change.id);
         return false;
       }
+      console.log("*** Found *** doc_id: " + change.id);
       if (!opts.include_docs) {
         delete change.doc;
       } else {
@@ -3508,6 +3510,23 @@
       //
       var leftToFetch = limit;
 
+      //Need doc_count for paging
+      var doc_count;
+      var update_seq;
+      if (!opts.continuous) {
+        api.info(function(err, res) {
+          if (err) {
+            return PouchUtils.call(opts.complete, err);
+          }
+          doc_count = res.doc_count;
+          update_seq = res.update_seq;
+          if (leftToFetch == 0) {
+            leftToFetch = update_seq;
+            limit = update_seq;
+          }
+        });
+      }
+
       if (opts.style) {
         params.style = opts.style;
       }
@@ -3607,6 +3626,25 @@
         }
 
         var resultsLength = res && res.results.length || 0;
+
+        // need to reset resultsLength if paging
+        if (!opts.continuous) {
+          resultsLength = leftToFetch;
+        }
+
+        //console.log("doc_count: " + doc_count)
+        if (limit && leftToFetch <= 0) {
+          console.log("limit && leftToFetch <= 0")
+        }
+        if (res && !resultsLength) {
+          console.log("res && !resultsLength")
+        }
+        if (resultsLength && res.last_seq === remoteLastSeq) {
+          console.log("resultsLength && res.last_seq === remoteLastSeq")
+        }
+        if (opts.descending && lastFetchedSeq !== 0) {
+          console.log("opts.descending && lastFetchedSeq !== 0")
+        }
         var finished = (limit && leftToFetch <= 0) ||
           (res && !resultsLength) ||
           (resultsLength && res.last_seq === remoteLastSeq) ||
@@ -4086,6 +4124,7 @@
 
       function insertDoc(docInfo) {
         // Cant insert new deleted documents
+        console.log("insertDoc: " + docInfo.metadata.id);
         if ('was_delete' in opts && PouchUtils.isDeleted(docInfo.metadata)) {
           results.push(Pouch.Errors.MISSING_DOC);
           return processDocs();
