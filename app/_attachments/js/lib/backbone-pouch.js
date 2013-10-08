@@ -25,6 +25,7 @@
   };
 
   BackbonePouch.defaults = {
+    view: null,
     fetch: 'allDocs',
     listen: true,
     options: {
@@ -53,6 +54,9 @@
     defaults.options = defaults.options || {};
 
     // merge toplevel options
+    if (typeof options.view === 'undefined') {
+      options.view = defaults.view;
+    }
     if (typeof options.fetch === 'undefined') {
       options.fetch = defaults.fetch;
     }
@@ -163,6 +167,11 @@
         // get single model
         if (model.id) {
           return options.db.get(model.id, options.options.get, callback);
+        }
+        // Backbone couch api support
+        if (this.view) {
+          options.fetch = "query";
+          options.options[options.fetch].fun = window[this.view];
         }
         // query view or spatial index
         if (options.fetch === 'query' || options.fetch === 'spatial') {

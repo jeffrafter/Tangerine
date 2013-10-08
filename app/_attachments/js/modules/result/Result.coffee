@@ -1,5 +1,4 @@
 class Result extends Backbone.Model
-
   url: "result"
 
   initialize: ( options ) ->
@@ -19,6 +18,7 @@ class Result extends Backbone.Model
         'userAgent' : navigator.userAgent
 
       @set
+        'collection'        : "result"
         'subtestData'       : []
         'start_time'        : (new Date()).getTime()
         'enumerator'        : Tangerine.user.name()

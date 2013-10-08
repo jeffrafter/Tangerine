@@ -265,55 +265,45 @@ class ResultsView extends Backbone.View
         "local"
 
     # TODO, this should be pulling from local and should therefore not be ajax.
-    $.ajax
-      url: Tangerine.settings.urlView(location, "resultSummaryByAssessmentId")+"?descending=true&limit=#{@resultLimit}&skip=#{@resultOffset}"
-      type: "POST"
-      dataType: "json"
-      contentType: "application/json"
-      data: JSON.stringify(
-        keys : [@assessment.id]
-      )
-      success: ( data ) =>
+    rows  = @results
+    count = rows.length
 
-        rows  = data.rows
-        count = rows.length
+    maxResults  = 100
+    currentPage = Math.floor( @resultOffset / @resultLimit ) + 1
 
-        maxResults  = 100
-        currentPage = Math.floor( @resultOffset / @resultLimit ) + 1
+    if @results.length > maxResults
+      @$el.find("#controls").removeClass("confirmation")
+      @$el.find("#page").val(currentPage)
+      @$el.find("#limit").val(@resultLimit)
 
-        if @results.length > maxResults
-          @$el.find("#controls").removeClass("confirmation")
-          @$el.find("#page").val(currentPage)
-          @$el.find("#limit").val(@resultLimit)
+    @$el.find('#result_position').html "#{@resultOffset+1}-#{Math.min(@resultOffset+@resultLimit,@results.length)} of #{@results.length}"
 
-        @$el.find('#result_position').html "#{@resultOffset+1}-#{Math.min(@resultOffset+@resultLimit,@results.length)} of #{@results.length}"
+    htmlRows = ""
+    for row in rows
 
-        htmlRows = ""
-        for row in rows
+      id      = row.value?.participant_id || "No ID"
+      endTime = row.get("end_time")
+      if endTime?
+        long    = moment(endTime).format('YYYY-MMM-DD HH:mm')
+        fromNow = moment(endTime).fromNow()
+      else
+        startTime = row.get("start_time")
+        long    = "<b>started</b> " + moment(startTime).format('YYYY-MMM-DD HH:mm')
+        fromNow = moment(startTime).fromNow()
 
-          id      = row.value?.participant_id || "No ID"
-          endTime = row.value.end_time
-          if endTime?
-            long    = moment(endTime).format('YYYY-MMM-DD HH:mm')
-            fromNow = moment(endTime).fromNow()
-          else
-            startTime = row.value.start_time
-            long    = "<b>started</b> " + moment(startTime).format('YYYY-MMM-DD HH:mm')
-            fromNow = moment(startTime).fromNow()
+      time    = "#{long} (#{fromNow})"
+      htmlRows += "
+        <div>
+          #{ id } -
+          #{ time }
+          <button data-result-id='#{row.id}' class='details command'>details</button>
+          <div id='details_#{row.id}'></div>
+        </div>
+      "
 
-          time    = "#{long} (#{fromNow})"
-          htmlRows += "
-            <div>
-              #{ id } -
-              #{ time }
-              <button data-result-id='#{row.id}' class='details command'>details</button>
-              <div id='details_#{row.id}'></div>
-            </div>
-          "
+    @$el.find("#results_container").html htmlRows
 
-        @$el.find("#results_container").html htmlRows
-
-        @$el.find(focus).focus()
+    @$el.find(focus).focus()
 
   afterRender: =>
     for view in @subViews
