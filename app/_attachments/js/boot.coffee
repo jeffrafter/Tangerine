@@ -8,6 +8,7 @@
 # Utils.disableConsoleAssert()
 
 Tangerine =
+#  "db_name"    : window.location.pathname.split("/")[1]
   "db_name"    : window.location.pathname.split("/")[1]
   "design_doc" : _.last(String(window.location).split("_design/")).split("/")[0]
 

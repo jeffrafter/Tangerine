@@ -1,3 +1,5 @@
+byCollection = (doc) -> emit(doc.collection, doc) if doc.collection
+
 resultsByAssessmentId = ( doc ) ->
   return unless doc.collection is 'result'
   id = doc.assessmentId || doc.klassId

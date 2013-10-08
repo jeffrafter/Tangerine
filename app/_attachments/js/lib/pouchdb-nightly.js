@@ -794,7 +794,7 @@
     }
   };
 
-  Pouch.DEBUG = false;
+  Pouch.DEBUG = true;
   Pouch.openReqList = {};
   Pouch.adapters = {};
   Pouch.plugins = {};
@@ -1898,7 +1898,7 @@
         console.log("Not doc_id: " + change.id);
         return false;
       }
-      console.log("*** Found *** doc_id: " + change.id);
+//      console.log("*** Found *** doc_id: " + change.id);
       if (!opts.include_docs) {
         delete change.doc;
       } else {

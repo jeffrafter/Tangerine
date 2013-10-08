@@ -102,6 +102,7 @@ file to the tangerine-pouch/www/ directory when a .coffee file is modified. Comm
 - Delete indexedDB database in javascript console:
 
         indexedDB.deleteDatabase('_pouch_tangerine');
+        indexedDB.deleteDatabase('_pouch_users');
 
 - View cookies:
 
