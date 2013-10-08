@@ -111,6 +111,11 @@ file to the tangerine-pouch/www/ directory when a .coffee file is modified. Comm
 
         www/js]$ coffee --bare --compile boot.coffee 2>&1
 
+- Sometimes all of the changes do not get pushed over to tangerine-pouch after fetching changes via git, even if you run init.js and file.watchr.
+Run this command to manually copy the changes over:
+
+        cp -R _attachments/ ../../tangerine-pouch/www/
+
 ##### 11. Tangerine admin tips
 
 - Configuration - once it is set, reads only from the database.

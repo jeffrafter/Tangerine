@@ -8967,7 +8967,7 @@ Backbone.Collection = (function(_super) {
         // Backbone couch api support
         if (this.view) {
           options.fetch = "query";
-          options.options[options.fetch].fun = this.view;
+          options.options[options.fetch].fun = window[this.view];
         }
         // query view or spatial index
         if (options.fetch === 'query' || options.fetch === 'spatial') {
