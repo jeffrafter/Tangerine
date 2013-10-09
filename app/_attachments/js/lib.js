@@ -2111,7 +2111,7 @@ function binb2b64(binarray)
         console.log("Not doc_id: " + change.id);
         return false;
       }
-      console.log("*** Found *** doc_id: " + change.id);
+//      console.log("*** Found *** doc_id: " + change.id);
       if (!opts.include_docs) {
         delete change.doc;
       } else {
@@ -8965,10 +8965,10 @@ Backbone.Collection = (function(_super) {
           return options.db.get(model.id, options.options.get, callback);
         }
         // Backbone couch api support
-        if (this.view) {
-          options.fetch = "query";
-          options.options[options.fetch].fun = window[this.view];
-        }
+//        if (this.view) {
+//          options.fetch = "query";
+//          options.options[options.fetch].fun = window[this.view];
+//        }
         // query view or spatial index
         if (options.fetch === 'query' || options.fetch === 'spatial') {
           if (!options.options[options.fetch].fun) {
