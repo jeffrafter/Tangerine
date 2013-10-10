@@ -235,16 +235,16 @@ Tangerine.printJSON = (callback) ->
   Tangerine.$db.allDocs {include_docs: true}, (err, response) ->
     docs = []
     for row in response.rows
-      if row.id == 'user-admin' || row.id == 'settings'
+      if row.id.match(/^user-/) || row.id == 'settings'
         continue
       docs.push(row.doc)
     console.log(JSON.stringify(docs))
 
 
 Tangerine.seed = (callback) ->
-  $.get '/_docs/tangerine.json', (response) ->
-    for row in response
-      Tangerine.$db.get row._id, (err, doc) ->
+  $.get '/_docs/tangerine.json', (response) =>
+    _.each response, (row) ->
+      Tangerine.$db.get row._id, (err, doc) =>
         if !doc
           console.log("Writing document: " + row._id)
           Tangerine.$db.put(row, {})
