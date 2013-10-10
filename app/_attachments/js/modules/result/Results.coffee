@@ -10,6 +10,8 @@ class Results extends Backbone.Collection
       query:
         fun:  resultsByAssessmentId
 #    view: "resultsByAssessmentId"
+  parse: 	(response) ->
+    return response[0]
 
   comparator: (model) ->
     model.get('start_time') || 0

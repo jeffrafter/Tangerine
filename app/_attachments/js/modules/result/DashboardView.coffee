@@ -14,7 +14,9 @@ class DashboardView extends Backbone.View
       resultDetails.hide()
     else
       resultId = $(event.target).text()
-      $.couch.db(document.location.pathname.match(/^\/(.*?)\//).pop()).openDoc resultId,
+#      $.couch.db(document.location.pathname.match(/^\/(.*?)\//).pop()).openDoc resultId,
+      dbResult = new Result(_id: resultId)
+      dbResult.fetch
         success: (result) =>
           resultDetails.html "<pre>#{@syntaxHighlight(result)}</pre>"
           resultDetails.css
@@ -22,6 +24,8 @@ class DashboardView extends Backbone.View
             width: 400
             left: 50
           resultDetails.show()
+        error: (msg) =>
+          console.log("Error: " + error)
 
   syntaxHighlight: (json) =>
     window.json = json
@@ -51,13 +55,25 @@ class DashboardView extends Backbone.View
     @shiftHours = options.shiftHours || 0
 
     if @key is "All"
-      $.couch.db(Tangerine.db_name).view "#{Tangerine.design_doc}/dashboardResults",
-        reduce: false
+#      $.couch.db(Tangerine.db_name).view "#{Tangerine.design_doc}/dashboardResults",
+      dbResults = new Results()
+      dbResults.fetch
+        fetch: 'query'
+        options:
+          query:
+            fun:  dashboardResults
+#        reduce: false
         success: @renderResults
     else
-      $.couch.db(Tangerine.db_name).view "#{Tangerine.design_doc}/dashboardResults",
-        key: @key
-        reduce: false
+#      $.couch.db(Tangerine.db_name).view "#{Tangerine.design_doc}/dashboardResults",
+      dbResults = new Results()
+      dbResults.fetch
+        fetch: 'query'
+        options:
+          query:
+            fun:  dashboardResults
+          key: @key
+          reduce: false
         success: @renderResults
 
   renderResults: (result) =>
@@ -66,12 +82,12 @@ class DashboardView extends Backbone.View
     propertiesToGroupBy = {}
 
     # Find the first possible grouping variable and use it if not defined
-    @groupBy = _.keys(result.rows[0].value)[0] unless @groupBy?
+    @groupBy = _.keys(result.models[0].attributes)[0] unless @groupBy?
 
-    _.each result.rows, (row) =>
-      leftColumn = row.value[@groupBy]
-      sortingDate = if row.value.startTime then moment(row.value.startTime).add("h",@shiftHours).format("YYYYMMDD") else "Unknown"
-      displayDate = if row.value.startTime then moment(row.value.startTime).add("h",@shiftHours).format("Do MMM") else "Unknown"
+    _.each result.models, (model) =>
+      leftColumn = model.get(@groupBy)
+      sortingDate = if model.get('start_time') then moment(model.get('start_time')).add("h",@shiftHours).format("YYYYMMDD") else "Unknown"
+      displayDate = if model.get('start_time') then moment(model.get('start_time')).add("h",@shiftHours).format("Do MMM") else "Unknown"
       dates[sortingDate] = displayDate
       tableRows[leftColumn] = {} unless tableRows[leftColumn]?
       tableRows[leftColumn][sortingDate] = [] unless tableRows[leftColumn][sortingDate]?
@@ -79,10 +95,10 @@ class DashboardView extends Backbone.View
         <div style='padding-top:10px;'>
           <table>
           #{
-            _.map(row.value, (value,key) =>
+            _.map(model.attributes, (value,key) =>
               propertiesToGroupBy[key] = true
-              value = moment(value).add("h",@shiftHours).format("YYYY-MM-DD HH:mm") if key is "startTime"
-              value = "<button class='result'>#{value}</button>" if key is "resultId"
+              value = moment(value).add("h",@shiftHours).format("YYYY-MM-DD HH:mm") if key is "start_time"
+              value = "<button class='result'>#{value}</button>" if key is "_id"
               "<tr><td>#{key}</td><td>#{value}</td></tr>"
             ).join("")
           }
@@ -91,7 +107,7 @@ class DashboardView extends Backbone.View
         <hr/>
       "
     @$el.html "
-      <h1>#{Tangerine.db_name}</h1>
+      <h1>#{Tangerine.settings.get("groupName")}</h1>
       Assessment:
       <select id='assessment'>
       </select>
@@ -193,21 +209,37 @@ class DashboardView extends Backbone.View
         $(".#{sortingDate}").toggle()
       @$el.find("#advancedOptions").append dateCheckbox
     )
-
-    $.couch.db(Tangerine.db_name).view "#{Tangerine.design_doc}/dashboardResults",
+#  $.couch.db(Tangerine.db_name).view "#{Tangerine.design_doc}/dashboardResults",
+    dbResults = new Results
+    dbResults.fetch
+      fetch: 'query'
+      options:
+        query:
+          fun:  dashboardResults
       group: true
       success: (result) =>
+#        _.each result.models, (model) =>
+#        leftColumn = model.get(@groupBy)
+        thisModel = result.models[0].attributes;
+        modelKeys = _.keys(thisModel)
         $("select#assessment").html "<option>All</option>" +
-        _.map(result.rows, (row) =>
-          "<option value='#{row.key}' #{if row.key is @key then "selected='true'" else ""}>#{row.key}</option>"
+#        _.map(result.models[0].attributes, (row) =>
+#          "<option value='#{row.key}' #{if row.key is @key then "selected='true'" else ""}>#{row.key}</option>"
+        _.map(modelKeys, (modelKey) =>
+#          "<option value='#{row.key}' #{if row.key is @key then "selected='true'" else ""}>#{row.key}</option>"
+          "<option value='#{modelKey}' #{if modelKey is @key then "selected='true'" else ""}>#{modelKey}</option>"
         ).join("")
-        _.each result.rows, (row) =>
-          return unless row.key?
-          $.couch.db(Tangerine.db_name).openDoc row.key,
-            success: (result) =>
-              $("option[value=#{row.key}]").html result.name
-            error: (result) =>
-              $("option[value=#{row.key}]").html "Unknown assessment"
+#        _.each result.models, (model) =>
+#          _.map(model.attributes, (value, key) =>
+##          "<option value='#{row.key}' #{if row.key is @key then "selected='true'" else ""}>#{row.key}</option>"
+#            $("option[value=#{key}]").html value
+#          ).join("")
+#          return unless row.key?
+#          $.couch.db(Tangerine.db_name).openDoc row.key,
+#            success: (result) =>
+#              $("option[value=#{row.key}]").html result.name
+#            error: (result) =>
+#              $("option[value=#{row.key}]").html "Unknown assessment"
 
 
     @trigger "rendered"
