@@ -57,7 +57,7 @@ watch ( '.*\.coffee$' ) { |match|
   end
 }
 
-watch ( '.*\.less$' ) { |match| 
+watch ( '.*\.less$' ) { |match|
   puts "\nCompiling:\t\t#{match}"
   result = `lessc #{match} --yui-compress > #{match}.css`
   if result.index "Error"
@@ -68,7 +68,7 @@ watch ( '.*\.less$' ) { |match|
   end
 }
 
-watch ( '.*\.css$|.*\.js$|.*\.html$|.*\.json$' ) { |match|
+watch ( '.*\.css$|.*\.js$|.*\.html$' ) { |match|
   if match.string().index("version.js") == nil && match.string().index("app.js") == nil
     puts "\nUpdating:\t\t#{match}\nPushing to couchapp\n\n"
     push()
@@ -81,6 +81,19 @@ watch ( '.*\.css$|.*\.js$|.*\.html$|.*\.json$' ) { |match|
   FileUtils.cp(match, pouchFilepath)
   puts "\nCopying FileName:\t#{match}\tTo Pouch:\t#{pouchFilepath}"
 }
+
+`mkdir -p ../../tangerine-pouch/www/_docs`
+
+watch ( '.*\.json$' ) { |match|
+  match = String(match)
+  path = match.split("/")
+  pouchDir = "../../tangerine-pouch/www/" + path[0..path.length-2].join("/")
+  filename = path[path.length-1]
+  pouchFilepath = pouchDir + "/" + filename
+  FileUtils.cp(match, pouchFilepath)
+  puts "\nCopying FileName:\t#{match}\tTo Pouch:\t#{pouchFilepath}"
+}
+
 
 push()
 

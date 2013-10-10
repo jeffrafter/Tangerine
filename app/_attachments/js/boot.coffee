@@ -9,18 +9,18 @@
 
 Tangerine =
 #  "db_name"    : window.location.pathname.split("/")[1]
-  "db_name"    : window.location.pathname.split("/")[1]
+  "db_name"    : 'tangerine'
   "design_doc" : _.last(String(window.location).split("_design/")).split("/")[0]
 
 # Local tangerine database handle
-Tangerine.$db = $.couch.db(Tangerine.db_name)
+Tangerine.$db = new PouchDB(Tangerine.db_name)
 
 # Backbone configuration
 # Backbone.couch_connector.config.db_name   = Tangerine.db_name
 # Backbone.couch_connector.config.ddoc_name = Tangerine.design_doc
 # Backbone.couch_connector.config.global_changes = false
 Backbone.sync = BackbonePouch.sync({
-  db: PouchDB('tangerine')
+  db: Tangerine.$db
 });
 Backbone.Model.prototype.idAttribute = '_id';
 
@@ -142,50 +142,50 @@ Tangerine.transitionUsers = (callback) ->
         nextDoc = () ->
           id = docIds.pop()
           return finish() unless id?
-          if doc = uDB.get id
-            teacher = null
-            # console.log doc
-            name = doc._id.split(":")[1]
+          uDB.get id, (err, doc) ->
+            if doc
+              teacher = null
+              # console.log doc
+              name = doc._id.split(":")[1]
 
-            hashes =
-              if doc.password_sha?
-                pass : doc.password_sha
-                salt : doc.salt
-              else
-                TabletUser.generateHash("password")
-
-            teacherId = doc.teacherId
-            unless teacherId?
-              teacherId = Utils.humanGUID()
-              teacher = new Teacher "_id" : teacherId, "name" : name
-
-            if name is "admin"
-              roles = ["_admin"]
-              hashes = TabletUser.generateHash("password")
-            else
-              roles = doc.roles || []
-
-
-            newDoc =
-              "_id"   : TabletUser.calcId(name)
-              "name"  : name
-              "roles" : roles
-              "pass"  : hashes.pass
-              "salt"  : hashes.salt
-              "teacherId"  : teacherId
-              "collection" : "user"
-            #return
-            Tangerine.$db.saveDoc newDoc,
-              success: (doc) ->
-                if teacher?
-                  teacher.save null,
-                    success: ->
-                      nextDoc()
+              hashes =
+                if doc.password_sha?
+                  pass : doc.password_sha
+                  salt : doc.salt
                 else
-                  nextDoc()
+                  TabletUser.generateHash("password")
 
-              error: (doc) ->
-                nextDoc()
+              teacherId = doc.teacherId
+              unless teacherId?
+                teacherId = Utils.humanGUID()
+                teacher = new Teacher "_id" : teacherId, "name" : name
+
+              if name is "admin"
+                roles = ["_admin"]
+                hashes = TabletUser.generateHash("password")
+              else
+                roles = doc.roles || []
+
+
+              newDoc =
+                "_id"   : TabletUser.calcId(name)
+                "name"  : name
+                "roles" : roles
+                "pass"  : hashes.pass
+                "salt"  : hashes.salt
+                "teacherId"  : teacherId
+                "collection" : "user"
+              #return
+              Tangerine.$db.put newDoc, (err, doc) ->
+                if err
+                  nextDoc()
+                else
+                  if teacher?
+                    teacher.save null,
+                      success: ->
+                        nextDoc()
+                  else
+                    nextDoc()
 
         finish = ->
           Tangerine.settings.save "usersTransitioned" : true,
@@ -205,24 +205,48 @@ Tangerine.ensureAdmin = (callback) ->
       password : "password"
       success: ->
         $.couch.userDb (uDB) =>
-          if doc = uDB.get "org.couchdb.user:admin"
-            $.couch.logout
-              success:->
-                Tangerine.settings.save "adminEnsured" : true
-                callback()
-              error: ->
-                console.log "error logging out admin user"
-          else
-            if doc = uDB.put
-              name     : "admin"
-              password : null
-              roles    : []
-              type     : "user"
-              _id      : "org.couchdb.user:admin"
-              Tangerine.settings.save "adminEnsured" : true
+          uDB.get "org.couchdb.user:admin", (err, doc) ->
+            if doc
               $.couch.logout
-                success: -> callback()
+                success:->
+                  Tangerine.settings.save "adminEnsured" : true
+                  callback()
                 error: ->
-                  console.log "Error logging out admin user"
+                  console.log "error logging out admin user"
+            else
+              uDB.put
+                name     : "admin"
+                password : null
+                roles    : []
+                type     : "user"
+                _id      : "org.couchdb.user:admin", (err, response) ->
+                  Tangerine.settings.save "adminEnsured" : true
+                  $.couch.logout
+                    success: -> callback()
+                    error: ->
+                      console.log "Error logging out admin user"
   else
     callback()
+
+Tangerine.printJSON = (callback) ->
+  Tangerine.$db.allDocs {include_docs: true}, (err, response) ->
+    docs = []
+    for row in response.rows
+      if row.id == 'user-admin' || row.id == 'settings'
+        continue
+      docs.push(row.doc)
+    console.log(JSON.stringify(docs))
+
+
+Tangerine.seed = (callback) ->
+  $.get '/_docs/tangerine.json', (response) ->
+    for row in response
+      Tangerine.$db.get row._id, (err, doc) ->
+        if !doc
+          console.log("Writing document: " + row._id)
+          Tangerine.$db.put(row, {})
+
+
+
+
+
