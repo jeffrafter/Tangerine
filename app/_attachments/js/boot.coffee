@@ -234,9 +234,10 @@ Tangerine.ensureAdmin = (callback) ->
 Tangerine.printJSON = (callback) ->
   Tangerine.$db.allDocs {include_docs: true}, (err, response) ->
     docs = []
-    for row in response.rows
-      if row.id.match(/^user-/) || row.id == 'settings'
-        continue
+    _.each response.rows, (row) ->
+      # If you want to pre-seed users you need to remove the match check here
+      if !row.id || row.id.match(/^user-/) || row.id == 'settings'
+        return
       docs.push(row.doc)
     console.log(JSON.stringify(docs))
 
