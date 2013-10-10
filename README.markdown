@@ -117,6 +117,9 @@ Run this command to manually copy the changes over:
 
         cp -R _attachments/ ../../tangerine-pouch/www/
 
+- It is preferred to use model.get("property") instead of using model.attributes, but something you have to use model.attributes.
+But try to follow [this advice](http://stackoverflow.com/a/15549077)
+
 ##### 11. Tangerine admin tips
 
 - Configuration - once it is set, reads only from the database.
