@@ -137,64 +137,67 @@ Tangerine.transitionUsers = (callback) ->
     password : "password"
     success: ->
       $.couch.userDb (uDB) =>
-        resp = uDB.allDocs
-        docIds = _.pluck(resp.rows, "id").filter (a) -> ~a.indexOf("org.couchdb")
-        nextDoc = () ->
-          id = docIds.pop()
-          return finish() unless id?
-          uDB.get id, (err, doc) ->
-            if doc
-              teacher = null
-              # console.log doc
-              name = doc._id.split(":")[1]
+        Tangerine.$db.allDocs {include_docs: true}, (err, response) ->
+          if (err)
+            console.log(err)
+            return
+          docIds = _.pluck(response.rows, "id").filter (a) -> ~a.indexOf("org.couchdb")
+          nextDoc = () ->
+            id = docIds.pop()
+            return finish() unless id?
+            uDB.get id, (err, doc) ->
+              if doc
+                teacher = null
+                # console.log doc
+                name = doc._id.split(":")[1]
 
-              hashes =
-                if doc.password_sha?
-                  pass : doc.password_sha
-                  salt : doc.salt
-                else
-                  TabletUser.generateHash("password")
-
-              teacherId = doc.teacherId
-              unless teacherId?
-                teacherId = Utils.humanGUID()
-                teacher = new Teacher "_id" : teacherId, "name" : name
-
-              if name is "admin"
-                roles = ["_admin"]
-                hashes = TabletUser.generateHash("password")
-              else
-                roles = doc.roles || []
-
-
-              newDoc =
-                "_id"   : TabletUser.calcId(name)
-                "name"  : name
-                "roles" : roles
-                "pass"  : hashes.pass
-                "salt"  : hashes.salt
-                "teacherId"  : teacherId
-                "collection" : "user"
-              #return
-              Tangerine.$db.put newDoc, (err, doc) ->
-                if err
-                  nextDoc()
-                else
-                  if teacher?
-                    teacher.save null,
-                      success: ->
-                        nextDoc()
+                hashes =
+                  if doc.password_sha?
+                    pass : doc.password_sha
+                    salt : doc.salt
                   else
+                    TabletUser.generateHash("password")
+
+                teacherId = doc.teacherId
+                unless teacherId?
+                  teacherId = Utils.humanGUID()
+                  teacher = new Teacher "_id" : teacherId, "name" : name
+
+                if name is "admin"
+                  roles = ["_admin"]
+                  hashes = TabletUser.generateHash("password")
+                else
+                  roles = doc.roles || []
+
+
+                newDoc =
+                  "_id"   : TabletUser.calcId(name)
+                  "name"  : name
+                  "roles" : roles
+                  "pass"  : hashes.pass
+                  "salt"  : hashes.salt
+                  "teacherId"  : teacherId
+                  "collection" : "user"
+                #return
+                Tangerine.$db.put newDoc, (err, doc) ->
+                  if err
                     nextDoc()
+                  else
+                    if teacher?
+                      teacher.save null,
+                        success: ->
+                          nextDoc()
+                    else
+                      nextDoc()
 
-        finish = ->
-          Tangerine.settings.save "usersTransitioned" : true,
-            success: ->
-              $.couch.logout
-                success: ->
-                  callback()
+          finish = ->
+            Tangerine.settings.save "usersTransitioned" : true,
+              success: ->
+                $.couch.logout
+                  success: ->
+                    callback()
 
-        nextDoc() # kick it off
+          nextDoc() # kick it off
 
 
 # if admin user doesn't exist in _users database, create it
