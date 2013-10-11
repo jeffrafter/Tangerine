@@ -1007,7 +1007,7 @@ function binb2b64(binarray)
     }
   };
 
-  Pouch.DEBUG = true;
+  Pouch.DEBUG = false;
   Pouch.openReqList = {};
   Pouch.adapters = {};
   Pouch.plugins = {};
@@ -6034,7 +6034,7 @@ function binb2b64(binarray)
       // prepare user doc based on name and password
       user_doc = this.prepareUserDoc(user_doc, password);
       return $.couch.userDb(function(db) {
-        db.saveDoc(user_doc, options);
+        db.put(user_doc, options);
       });
     },
 

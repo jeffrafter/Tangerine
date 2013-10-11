@@ -9,23 +9,22 @@ class DashboardView extends Backbone.View
     "click .result": "showResult"
 
   showResult: (event) =>
+    view = this
     resultDetails = $("#resultDetails")
     if resultDetails.is(":visible")
       resultDetails.hide()
     else
       resultId = $(event.target).text()
-#      $.couch.db(document.location.pathname.match(/^\/(.*?)\//).pop()).openDoc resultId,
-      dbResult = new Result(_id: resultId)
-      dbResult.fetch
-        success: (result) =>
-          resultDetails.html "<pre>#{@syntaxHighlight(result)}</pre>"
+      Tangerine.$db.get resultId, (err, result) ->
+        if result
+          resultDetails.html "<pre>#{view.syntaxHighlight(result)}</pre>"
           resultDetails.css
             top: $(event.target).position().top + 30
             width: 400
             left: 50
           resultDetails.show()
-        error: (msg) =>
-          console.log("Error: " + error)
+        else
+          console.log("Error: " + err)
 
   syntaxHighlight: (json) =>
     window.json = json
@@ -177,9 +176,9 @@ class DashboardView extends Backbone.View
         }
         pre {
           font-size: 75%;
-          outline: 1px solid #ccc; 
-          padding: 5px; 
-          margin: 5px; 
+          outline: 1px solid #ccc;
+          padding: 5px;
+          margin: 5px;
           text-shadow: none;
           overflow-wrap:break-word;
         }
